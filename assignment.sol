@@ -151,15 +151,17 @@ contract tradeContract{
     }
     
     // new order setter function
-    function placeOrder_S(string memory _bname, string memory _daddress, address _bAddress, int _itemID, int _qty, int _sellingPrice) public {
+    // function placeOrder_S(string memory _bname, string memory _daddress, address _bAddress, int _itemID, int _qty, int _sellingPrice) public {
+    function placeOrder_S(string memory _bname, string memory _daddress, address _bAddress, int _itemID, int _qty) public {
         
 	require(items[_itemID].qty >= _qty); // making sure there are enough items
     int i;
     for(i=1; i <= orderCount; i++){
-      require(items[orders[i].item_id].selleraddress == msg.sender &&  items[orders[i].item_id].price == bids[_itemID].currentBid);
+      //require(items[orders[i].item_id].selleraddress == msg.sender &&  items[orders[i].item_id].price == bids[_itemID].currentBid);
+        require(items[orders[i].item_id].selleraddress == msg.sender &&  items[_itemID].price == bids[_itemID].currentBid);
     }
         orderCount += 1;
-        orders[orderCount] = order(orderCount, _itemID, _qty, _bname, _sellingPrice, "Placed", _daddress, msg.sender);
+        orders[orderCount] = order(orderCount, _itemID, _qty, _bname, items[_itemID].price, "Placed", _daddress, msg.sender);
         items[_itemID].qty -= _qty; // after adding item, deduct the qty
     }
     
@@ -167,15 +169,15 @@ contract tradeContract{
     //*********************BUYER-SIDE AVAILABLE FUNCTIONS**************
     
     // new Bid order setter function
-    function placeBid_B(string memory _bname, string memory _daddress, int _itemID, int _qty, int _sellingPrice) public {
+    // function placeBid_B(string memory _bname, string memory _daddress, int _itemID, int _qty, int _sellingPrice) public {
         
-	  require(items[_itemID].qty >= _qty); // making sure there are enough items
+	//   require(items[_itemID].qty >= _qty); // making sure there are enough items
         
-        orderCount += 1;
-        //orders[orderCount] = order(orderCount, _itemID, _qty, _bname, _sellingPrice, "Placed", _daddress, msg.sender);
-        bids[orderCount] = bid(orderCount, _itemID, _qty, _sellingPrice, _sellingPrice+delta, "Live",  msg.sender);
-        items[_itemID].qty -= _qty; // after adding item, deduct the qty
-    }
+    //     orderCount += 1;
+    //     //orders[orderCount] = order(orderCount, _itemID, _qty, _bname, _sellingPrice, "Placed", _daddress, msg.sender);
+    //     bids[orderCount] = bid(orderCount, _itemID, _qty, _sellingPrice, _sellingPrice+delta, "Live",  msg.sender);
+    //     items[_itemID].qty -= _qty; // after adding item, deduct the qty
+    // }
     
     // order getter function buyer authenticated
     function getOrderCount_B(address _addr) view public returns (int) {
@@ -205,7 +207,9 @@ contract tradeContract{
     function bidPrice_B(int _newBid, int _itemID, int _qty ) public {
         
 	    // require(items[_itemID].qty >= _qty); // making sure there are enough items
-        require(bids[_itemID].nextBid <= _newBid ); //
+        require(bids[_itemID].nextBid <= _newBid);
+        require ( items[_itemID].price <= _newBid ); 
+        //
         // orderCount += 1;
 
         // orders[orderCount] = order(orderCount, _itemID, _qty, _bname, _sellingPrice, "Placed", _daddress, msg.sender);
